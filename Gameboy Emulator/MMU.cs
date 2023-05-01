@@ -13,6 +13,8 @@ namespace Gameboy_Emulator
         {
             memory = new byte[0xFFFF];
         }
+
+        public 
         public void WriteByte(ushort addr, byte value) { memory[addr] = value; }
         public byte ReadByte(ushort addr) { return memory[addr]; }
     }

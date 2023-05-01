@@ -8,6 +8,9 @@ namespace Gameboy_Emulator
         const string fileName = "C:\\Users\\dgray\\Downloads\\BADAPPLE.GBC";
         static void Main(string[] args)
         {
+            MMU mmu = new MMU(); 
+
+            mmu.
             if(File.Exists(fileName))
             {
                 ReadRom();
@@ -38,8 +41,10 @@ namespace Gameboy_Emulator
                 hex = String.Format("{0:x2}", hexIn); 
 
                 Console.WriteLine(hex);
-                System.Threading.Thread.Sleep(1000); 
-            }
+                System.Threading.Thread.Sleep(1000);
+
+
+             dataArray = File.ReadAllBytes(fileName); 
         }
 
         private static void PrintMessage(String message)
