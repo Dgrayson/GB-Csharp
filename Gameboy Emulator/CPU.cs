@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using static Gameboy_Emulator.MMU; 
 
@@ -17,19 +19,53 @@ namespace Gameboy_Emulator
         private ushort HL;
 
         private ushort SP;
-        private ushort PC; 
+        private ushort PC;
+
+        private bool FlagZ, FlagN, FlagH, FlagC;
 
         public CPU(MMU mmu)
         {
-            this._mmu = mmu; 
+            this._mmu = mmu;
+
+            A = 0x01;
+            B = 0xFF;
+            C = 0x13;
+            D = 0x00;
+            E = 0xC1;
+            H = 0x84;
+            L = 0x03;
+
+            PC = 0x0100;
+            SP = 0xFFFE; 
         }
 
         public void execute()
         {
             byte opcode = _mmu.ReadByte(PC);
+            bool jumped = false; 
+
+            String hex = String.Format("{0:x2}", opcode);
+            Console.WriteLine("Opcode is: {0}", hex);
+            System.Threading.Thread.Sleep(1000);
 
             switch (opcode)
             {
+                case 0x00: break; // NOP
+                case 0x0f:
+                    F = 0;
+                    FlagC = ((A & 0x1) != 0);
+                    A = (byte)((A >> 1) | (A << 7));
+                    break;
+                case 0x17:
+                    break; 
+                case 0x1f:
+                    bool preC = FlagC;
+                    F = 0;
+                    FlagC = ((A & 0x1) != 0);
+                    A = (byte)((A >> 1) | (preC ? 0x80 : 0));
+                    break; 
+
+                case 0x2f: { A = (byte)~A; FlagN = true; FlagH = true; break; }
                 // Loads
                 case 0x40: { B = B; break; }
                 case 0x41: { B = C; break; }
@@ -68,11 +104,20 @@ namespace Gameboy_Emulator
                 case 0x83: { A += E;    break; }
                 case 0x84: { A += H;    break; }
                 //case 0x85: { A += HL;   break; }
-                case 0x86: { A += A;    break; }  
+                case 0x86: { A += A;    break; }
 
-                case  
-                default: { break; } 
+                case 0xC3: {
+              
+
+                        PC = (ushort)((_mmu.ReadByte(PC++) << 8) | _mmu.ReadByte(PC++)); 
+                        jumped = true;  
+                        break; 
+                    }
+                default: { Console.WriteLine("Unimplemented OpCode"); break; } 
             }
+
+            if (!jumped)
+                PC++; 
         }
 
         public void LoadRegister() { }

@@ -5,53 +5,30 @@ namespace Gameboy_Emulator
 {
     class Program
     {
-        const string fileName = "C:\\Users\\dgray\\Downloads\\BADAPPLE.GBC";
+        const string fileName = "C:\\Users\\dgray\\OneDrive\\Desktop\\GB-Csharp\\Gameboy Emulator\\BADAPPLE.GBC";
         static void Main(string[] args)
         {
-            MMU mmu = new MMU(); 
+            MMU mmu = new MMU();
+            CPU cpu; 
 
-            mmu.
             if(File.Exists(fileName))
             {
-                ReadRom();
+                mmu.ReadRom(fileName);
             }
             else
             {
-                PrintMessage("File does not exist.");
+                Console.WriteLine("File does not exist.");
+                return; 
             }
-        }
 
-        private static byte[] ReadRom()
-        {
-            byte[] dataArray = new byte[100000];
+            cpu = new CPU(mmu);
 
-            PrintMessage("READING ROM"); 
+            bool running = true; 
 
-            using FileStream fileStream = new FileStream(fileName, FileMode.Open);
-            fileStream.Seek(0, SeekOrigin.Begin);
-
-            Console.WriteLine("Filestream length is: {0}", fileStream.Length);
-
-            int hexIn;
-            String hex; 
-
-            for (int i = 0; i < fileStream.Length; i++)
+            while(running)
             {
-                hexIn = fileStream.ReadByte();
-                hex = String.Format("{0:x2}", hexIn); 
-
-                Console.WriteLine(hex);
-                System.Threading.Thread.Sleep(1000);
-
-
-             dataArray = File.ReadAllBytes(fileName); 
-        }
-
-        private static void PrintMessage(String message)
-        {
-            Console.WriteLine("*******************");
-            Console.WriteLine("*   {0}", message);
-            Console.WriteLine("*******************");
+                cpu.execute(); 
+            }
         }
     }
 }
